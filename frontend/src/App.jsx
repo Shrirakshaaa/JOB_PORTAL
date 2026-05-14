@@ -8,7 +8,10 @@ import RecruiterDashboard from './pages/RecruiterDashboard';
 function App() {
   return (
     <BrowserRouter>
-      <div className="animated-bg"></div>
+      <video className="video-bg" autoPlay loop muted playsInline>
+        <source src="https://assets.codepen.io/3364143/7btrrd.mp4" type="video/mp4" />
+      </video>
+      <div className="animated-bg-overlay"></div>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
