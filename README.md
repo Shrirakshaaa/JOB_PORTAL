@@ -2,14 +2,14 @@
 
 An elite, full-stack AI-driven job matching platform designed to connect visionary companies with top-tier talent. This application leverages a Spring Boot backend, a state-of-the-art React frontend, and a custom TF-IDF neural matching engine to provide an unparalleled recruiting experience.
 
-## ✨ Features
+##  Features
 
 - **Jaw-Dropping UI:** Built with Vite and React, featuring an interactive 3D neural network background (Vanta.js), smooth Framer Motion page transitions, and a premium "neon-glass" aesthetic.
 - **AI Match Engine:** Upload your resume (PDF/DOCX) and our Apache Tika-powered engine will extract your skills and use a TF-IDF Cosine Similarity algorithm to score your profile against live job descriptions.
 - **Role-Based Access:** Dedicated dashboards for both Candidates and Recruiters, secured via stateless JWT authentication.
 - **Bento Box Grids:** Job cards and feature elements are presented in a sleek, modern grid with magnetic "spotlight" hover effects tracking the user's custom cursor.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 ### Backend
 - **Java 17 & Spring Boot 3**
@@ -25,7 +25,7 @@ An elite, full-stack AI-driven job matching platform designed to connect visiona
 - **Framer Motion & React Tilt:** For buttery smooth micro-animations and 3D tactile cards.
 - **Lucide React:** Beautiful, consistent iconography.
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
@@ -52,5 +52,5 @@ npm run dev
 ```
 *Note: The frontend runs on `http://localhost:5173`.*
 
-## 📜 License
+##  License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
