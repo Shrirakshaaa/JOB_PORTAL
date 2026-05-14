@@ -134,7 +134,7 @@ export default function CandidateDashboard() {
           myApplications.length > 0 ? myApplications.map(app => (
             <motion.div key={app.id} variants={itemVariants}>
               <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} glareEnable={true} glareMaxOpacity={0.1}>
-                <div className="job-card neon-glass">
+                <div className="job-card neon-glass spotlight-card">
                   <h3>{app.job.title}</h3>
                   <div className="company">{app.job.location} • {app.job.salary}</div>
                   <p className="desc">Status: <strong style={{ color: 'var(--primary)' }}>{app.status}</strong></p>
@@ -150,7 +150,7 @@ export default function CandidateDashboard() {
             return (
               <motion.div key={job.id || index} variants={itemVariants}>
                 <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} glareEnable={true} glareMaxOpacity={0.1}>
-                  <div className="job-card neon-glass">
+                  <div className="job-card neon-glass spotlight-card">
                     {score && <div className="match-score">{score.toFixed(1)}% Match</div>}
                     <h3>{job.title}</h3>
                     <div className="company">{job.location} • {job.salary}</div>

@@ -111,7 +111,7 @@ export default function RecruiterDashboard() {
             {jobs.length > 0 ? jobs.map(job => (
               <motion.div key={job.id} variants={itemVariants}>
                 <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} glareEnable={true} glareMaxOpacity={0.1}>
-                  <div className="job-card neon-glass">
+                  <div className="job-card neon-glass spotlight-card">
                     <h3>{job.title}</h3>
                     <div className="company">{job.location} • {job.salary}</div>
                     <p className="desc">{job.description.substring(0, 100)}...</p>
@@ -166,7 +166,7 @@ export default function RecruiterDashboard() {
               {applications.length > 0 ? applications.map(app => (
                 <motion.div key={app.id} variants={itemVariants}>
                   <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} glareEnable={true} glareMaxOpacity={0.1}>
-                    <div className="job-card neon-glass">
+                    <div className="job-card neon-glass spotlight-card">
                       <h3>{app.candidate.name}</h3>
                       <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{app.candidate.email}</p>
                       <div className="match-score" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#818cf8' }}>
