@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import * as THREE from 'three';
-import NET from 'vanta/dist/vanta.net.min';
+import NET from 'vanta/src/vanta.net';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
