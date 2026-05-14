@@ -8,6 +8,7 @@ import RecruiterDashboard from './pages/RecruiterDashboard';
 function App() {
   return (
     <BrowserRouter>
+      <div className="animated-bg"></div>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

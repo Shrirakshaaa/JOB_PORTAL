@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { motion, AnimatePresence } from 'framer-motion';
+import Tilt from 'react-parallax-tilt';
 import '../styles/Dashboard.css';
 
 export default function RecruiterDashboard() {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [activeTab, setActiveTab] = useState('my-jobs'); // 'my-jobs', 'post-job', 'view-applications'
+  const [activeTab, setActiveTab] = useState('my-jobs');
   const [selectedJob, setSelectedJob] = useState(null);
   
-  // Post Job Form State
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [requirements, setRequirements] = useState('');
@@ -28,13 +29,11 @@ export default function RecruiterDashboard() {
     }
   }, [navigate]);
 
-  const config = {
-    headers: { Authorization: `Bearer ${token}` }
-  };
+  const config = { headers: { Authorization: `Bearer ${token}` } };
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get('http://localhost:8080/api/jobs', config);
+      const res = await axios.get('http://localhost:8081/api/jobs', config);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs', err);
@@ -44,7 +43,7 @@ export default function RecruiterDashboard() {
   const handlePostJob = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8080/api/jobs', {
+      await axios.post('http://localhost:8081/api/jobs', {
         title, description, requirements, location, salary
       }, config);
       alert('Job posted successfully!');
@@ -60,19 +59,18 @@ export default function RecruiterDashboard() {
   const viewApplications = async (job) => {
     setSelectedJob(job);
     try {
-      const res = await axios.get(`http://localhost:8080/api/applications/job/${job.id}`, config);
+      const res = await axios.get(`http://localhost:8081/api/applications/job/${job.id}`, config);
       setApplications(res.data);
       setActiveTab('view-applications');
     } catch (err) {
       console.error('Error fetching applications', err);
-      alert('Failed to fetch applications or you do not have permission.');
+      alert('Failed to fetch applications.');
     }
   };
 
   const updateStatus = async (appId, status) => {
     try {
-      await axios.put(`http://localhost:8080/api/applications/${appId}/status?status=${status}`, {}, config);
-      alert('Status updated!');
+      await axios.put(`http://localhost:8081/api/applications/${appId}/status?status=${status}`, {}, config);
       viewApplications(selectedJob);
     } catch (err) {
       console.error('Error updating status', err);
@@ -85,11 +83,21 @@ export default function RecruiterDashboard() {
     navigate('/login');
   };
 
+  const listVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+  };
+  
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  };
+
   return (
-    <div className="dashboard-container">
+    <motion.div className="dashboard-container" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
       <div className="dashboard-header">
         <h1>Recruiter Dashboard</h1>
-        <button className="btn-secondary" onClick={handleLogout}>Logout</button>
+        <button className="btn-secondary neon-glass" onClick={handleLogout}>Logout</button>
       </div>
 
       <div className="tabs">
@@ -97,82 +105,88 @@ export default function RecruiterDashboard() {
         <button className={`tab ${activeTab === 'post-job' ? 'active' : ''}`} onClick={() => setActiveTab('post-job')}>Post New Job</button>
       </div>
 
-      {activeTab === 'my-jobs' && (
-        <div className="job-list">
-          {jobs.length > 0 ? jobs.map(job => (
-            <div key={job.id} className="job-card">
-              <h3>{job.title}</h3>
-              <div className="company">{job.location} • {job.salary}</div>
-              <p className="desc">{job.description.substring(0, 100)}...</p>
-              <button className="btn-secondary" onClick={() => viewApplications(job)}>View Applicants</button>
-            </div>
-          )) : <p>You haven't posted any jobs yet.</p>}
-        </div>
-      )}
+      <AnimatePresence mode="wait">
+        {activeTab === 'my-jobs' && (
+          <motion.div className="job-list" variants={listVariants} initial="hidden" animate="visible" exit={{ opacity: 0 }}>
+            {jobs.length > 0 ? jobs.map(job => (
+              <motion.div key={job.id} variants={itemVariants}>
+                <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} glareEnable={true} glareMaxOpacity={0.1}>
+                  <div className="job-card neon-glass">
+                    <h3>{job.title}</h3>
+                    <div className="company">{job.location} • {job.salary}</div>
+                    <p className="desc">{job.description.substring(0, 100)}...</p>
+                    <button className="btn-secondary" onClick={() => viewApplications(job)}>View Applicants</button>
+                  </div>
+                </Tilt>
+              </motion.div>
+            )) : <p>You haven't posted any jobs yet.</p>}
+          </motion.div>
+        )}
 
-      {activeTab === 'post-job' && (
-        <div className="upload-section" style={{ textAlign: 'left' }}>
-          <h3>Create a New Job Posting</h3>
-          <form onSubmit={handlePostJob} style={{ marginTop: '1.5rem' }}>
-            <div className="form-group">
-              <label>Job Title</label>
-              <input type="text" value={title} onChange={e => setTitle(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label>Location</label>
-              <input type="text" value={location} onChange={e => setLocation(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label>Salary</label>
-              <input type="text" value={salary} onChange={e => setSalary(e.target.value)} required />
-            </div>
-            <div className="form-group">
-              <label>Description</label>
-              <textarea 
-                value={description} 
-                onChange={e => setDescription(e.target.value)} 
-                required 
-                style={{ width: '100%', padding: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', minHeight: '100px' }}
-              />
-            </div>
-            <div className="form-group">
-              <label>Requirements / Skills (Used for AI Matching)</label>
-              <textarea 
-                value={requirements} 
-                onChange={e => setRequirements(e.target.value)} 
-                required 
-                style={{ width: '100%', padding: '0.75rem', background: 'rgba(15, 23, 42, 0.6)', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)', minHeight: '100px' }}
-              />
-            </div>
-            <button type="submit" className="btn-primary">Publish Job</button>
-          </form>
-        </div>
-      )}
-
-      {activeTab === 'view-applications' && (
-        <div>
-          <button className="btn-secondary" onClick={() => setActiveTab('my-jobs')} style={{ marginBottom: '1rem' }}>&larr; Back to Jobs</button>
-          <h3>Applicants for: {selectedJob?.title}</h3>
-          <div className="job-list" style={{ marginTop: '1.5rem' }}>
-            {applications.length > 0 ? applications.map(app => (
-              <div key={app.id} className="job-card">
-                <h3>{app.candidate.name}</h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{app.candidate.email}</p>
-                <div className="match-score" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#818cf8' }}>
-                  AI Match Score: {app.matchScore ? app.matchScore.toFixed(1) : 'N/A'}%
-                </div>
-                <p className="desc" style={{ marginBottom: '0.5rem' }}>Resume: <a href={app.resumeUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>View Document</a></p>
-                <p className="desc">Current Status: <strong>{app.status}</strong></p>
-                <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
-                  <button className="btn-secondary" onClick={() => updateStatus(app.id, 'REVIEWED')} style={{ flex: 1, padding: '0.25rem' }}>Review</button>
-                  <button className="btn-secondary" onClick={() => updateStatus(app.id, 'ACCEPTED')} style={{ flex: 1, padding: '0.25rem', borderColor: '#10b981', color: '#10b981' }}>Accept</button>
-                  <button className="btn-secondary" onClick={() => updateStatus(app.id, 'REJECTED')} style={{ flex: 1, padding: '0.25rem', borderColor: '#ef4444', color: '#ef4444' }}>Reject</button>
-                </div>
+        {activeTab === 'post-job' && (
+          <motion.div 
+            className="upload-section neon-glass" 
+            style={{ textAlign: 'left' }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+          >
+            <h3>Create a New Job Posting</h3>
+            <form onSubmit={handlePostJob} style={{ marginTop: '1.5rem' }}>
+              <div className="form-group">
+                <label>Job Title</label>
+                <input type="text" value={title} onChange={e => setTitle(e.target.value)} required className="neon-glass" />
               </div>
-            )) : <p>No applications yet.</p>}
-          </div>
-        </div>
-      )}
-    </div>
+              <div className="form-group">
+                <label>Location</label>
+                <input type="text" value={location} onChange={e => setLocation(e.target.value)} required className="neon-glass" />
+              </div>
+              <div className="form-group">
+                <label>Salary</label>
+                <input type="text" value={salary} onChange={e => setSalary(e.target.value)} required className="neon-glass" />
+              </div>
+              <div className="form-group">
+                <label>Description</label>
+                <textarea value={description} onChange={e => setDescription(e.target.value)} required className="neon-glass" style={{ width: '100%', padding: '0.75rem', minHeight: '100px', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }} />
+              </div>
+              <div className="form-group">
+                <label>Requirements / Skills</label>
+                <textarea value={requirements} onChange={e => setRequirements(e.target.value)} required className="neon-glass" style={{ width: '100%', padding: '0.75rem', minHeight: '100px', border: '1px solid var(--border-color)', borderRadius: '8px', color: 'var(--text-main)' }} />
+              </div>
+              <button type="submit" className="btn-primary">Publish Job</button>
+            </form>
+          </motion.div>
+        )}
+
+        {activeTab === 'view-applications' && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <button className="btn-secondary neon-glass" onClick={() => setActiveTab('my-jobs')} style={{ marginBottom: '1rem' }}>&larr; Back to Jobs</button>
+            <h3>Applicants for: {selectedJob?.title}</h3>
+            <motion.div className="job-list" variants={listVariants} initial="hidden" animate="visible" style={{ marginTop: '1.5rem' }}>
+              {applications.length > 0 ? applications.map(app => (
+                <motion.div key={app.id} variants={itemVariants}>
+                  <Tilt tiltMaxAngleX={10} tiltMaxAngleY={10} glareEnable={true} glareMaxOpacity={0.1}>
+                    <div className="job-card neon-glass">
+                      <h3>{app.candidate.name}</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{app.candidate.email}</p>
+                      <div className="match-score" style={{ background: 'rgba(99, 102, 241, 0.1)', color: '#818cf8' }}>
+                        AI Match Score: {app.matchScore ? app.matchScore.toFixed(1) : 'N/A'}%
+                      </div>
+                      <p className="desc" style={{ marginBottom: '0.5rem' }}>Resume: <a href={app.resumeUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)' }}>View</a></p>
+                      <p className="desc">Current Status: <strong>{app.status}</strong></p>
+                      <div style={{ display: 'flex', gap: '0.5rem', marginTop: 'auto' }}>
+                        <button className="btn-secondary" onClick={() => updateStatus(app.id, 'REVIEWED')} style={{ flex: 1, padding: '0.25rem' }}>Review</button>
+                        <button className="btn-secondary" onClick={() => updateStatus(app.id, 'ACCEPTED')} style={{ flex: 1, padding: '0.25rem', borderColor: '#10b981', color: '#10b981' }}>Accept</button>
+                        <button className="btn-secondary" onClick={() => updateStatus(app.id, 'REJECTED')} style={{ flex: 1, padding: '0.25rem', borderColor: '#ef4444', color: '#ef4444' }}>Reject</button>
+                      </div>
+                    </div>
+                  </Tilt>
+                </motion.div>
+              )) : <p>No applications yet.</p>}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
