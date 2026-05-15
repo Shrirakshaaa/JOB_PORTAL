@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import '../styles/Auth.css';
 
 export default function Register() {
@@ -40,7 +40,7 @@ export default function Register() {
       return;
     }
     try {
-      await axios.post('http://localhost:8081/api/auth/register', { name, email, phone, password, role });
+      await api.post('/api/auth/register', { name, email, phone, password, role });
       navigate('/login');
     } catch (err) {
       setError(err.response?.data || 'Registration failed. Please try again.');

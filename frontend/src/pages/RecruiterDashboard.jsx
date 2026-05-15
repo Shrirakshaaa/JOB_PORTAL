@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
 import '../styles/Dashboard.css';
@@ -33,7 +33,7 @@ export default function RecruiterDashboard() {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get('http://localhost:8081/api/jobs', config);
+      const res = await api.get('/api/jobs', config);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs', err);
@@ -43,7 +43,7 @@ export default function RecruiterDashboard() {
   const handlePostJob = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8081/api/jobs', {
+      await api.post('/api/jobs', {
         title, description, requirements, location, salary
       }, config);
       alert('Job posted successfully!');
@@ -59,7 +59,7 @@ export default function RecruiterDashboard() {
   const viewApplications = async (job) => {
     setSelectedJob(job);
     try {
-      const res = await axios.get(`http://localhost:8081/api/applications/job/${job.id}`, config);
+      const res = await api.get(`/api/applications/job/${job.id}`, config);
       setApplications(res.data);
       setActiveTab('view-applications');
     } catch (err) {
@@ -70,7 +70,7 @@ export default function RecruiterDashboard() {
 
   const updateStatus = async (appId, status) => {
     try {
-      await axios.put(`http://localhost:8081/api/applications/${appId}/status?status=${status}`, {}, config);
+      await api.put(`/api/applications/${appId}/status?status=${status}`, {}, config);
       viewApplications(selectedJob);
     } catch (err) {
       console.error('Error updating status', err);

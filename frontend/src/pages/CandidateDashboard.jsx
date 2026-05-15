@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 import { motion, AnimatePresence } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
 import '../styles/Dashboard.css';
@@ -29,7 +29,7 @@ export default function CandidateDashboard() {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get('http://localhost:8081/api/jobs', config);
+      const res = await api.get('/api/jobs', config);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs', err);
@@ -38,7 +38,7 @@ export default function CandidateDashboard() {
 
   const fetchMyApplications = async () => {
     try {
-      const res = await axios.get('http://localhost:8081/api/applications/my-applications', config);
+      const res = await api.get('/api/applications/my-applications', config);
       setMyApplications(res.data);
     } catch (err) {
       console.error('Error fetching applications', err);
@@ -54,8 +54,8 @@ export default function CandidateDashboard() {
     formData.append('file', file);
 
     try {
-      const res = await axios.post('http://localhost:8081/api/jobs/recommended', formData, {
-        headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` }
+      const res = await api.post('/api/jobs/recommended', formData, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       });
       setJobs(res.data);
       setActiveTab('recommended');
@@ -69,7 +69,7 @@ export default function CandidateDashboard() {
 
   const handleApply = async (jobId) => {
     try {
-      await axios.post('http://localhost:8081/api/applications', {
+      await api.post('/api/applications', {
         jobId: jobId, resumeUrl: 'uploaded-resume.pdf'
       }, config);
       alert('Applied successfully!');
