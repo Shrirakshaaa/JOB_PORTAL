@@ -34,8 +34,12 @@ body {
   .custom-cursor { display: none !important; }
 }
 
-a, button, input, textarea {
-  cursor: none;
+a, button, input, textarea, select {
+  cursor: pointer;
+}
+
+input[type="text"], input[type="email"], input[type="password"], input[type="tel"], input[type="number"], textarea {
+  cursor: text;
 }
 
 /* Vanta Container */
@@ -109,4 +113,7 @@ a, button, input, textarea {
 .custom-cursor.active {
   width: 60px;
   height: 60px;
+}
+.custom-cursor.hidden {
+  opacity: 0;
 }

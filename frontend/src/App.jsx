@@ -11,6 +11,7 @@ import RecruiterDashboard from './pages/RecruiterDashboard';
 const CustomCursor = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [active, setActive] = useState(false);
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     const moveCursor = (e) => {
@@ -18,7 +19,23 @@ const CustomCursor = () => {
     };
     
     const handleMouseOver = (e) => {
-      if (e.target.tagName.toLowerCase() === 'button' || e.target.tagName.toLowerCase() === 'a' || e.target.closest('button') || e.target.closest('a') || e.target.closest('.job-card') || e.target.closest('.feature-card')) {
+      const target = e.target;
+      const isInteractive = target.tagName.toLowerCase() === 'button' || 
+                            target.tagName.toLowerCase() === 'a' || 
+                            target.tagName.toLowerCase() === 'input' || 
+                            target.tagName.toLowerCase() === 'select' || 
+                            target.tagName.toLowerCase() === 'textarea' || 
+                            target.closest('button') || 
+                            target.closest('a') || 
+                            target.closest('input');
+                            
+      if (isInteractive) {
+        setHidden(true);
+      } else {
+        setHidden(false);
+      }
+
+      if (target.closest('.job-card') || target.closest('.feature-card')) {
         setActive(true);
       } else {
         setActive(false);
@@ -36,7 +53,7 @@ const CustomCursor = () => {
 
   return (
     <div 
-      className={`custom-cursor ${active ? 'active' : ''}`} 
+      className={`custom-cursor ${active ? 'active' : ''} ${hidden ? 'hidden' : ''}`} 
       style={{ left: `${position.x}px`, top: `${position.y}px` }}
     />
   );
